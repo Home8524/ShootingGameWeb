@@ -29,7 +29,6 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            aspect-ratio: 9 / 16; /* 비율을 9:16로 고정 */
             position: absolute;
             top: 0;
             left: 0;
@@ -56,16 +55,20 @@
         };
 
         var scaleToFit = true;
+        var splashEnd = false;
 
         // Unity로부터 메시지를 받을 핸들러
         function OnSplashEnd() {
-
+            splashEnd = true;
             setTimeout(() => {
                 onResize();
             }, 0); 
         }
 
         function onResize() {
+
+            if(!splashEnd) return;
+
             var container = canvas.parentElement;
             var w, h;
 
@@ -94,6 +97,7 @@
             }
         }
 
+
         function triggerResizeEvent() {
             var event = new Event('resize');
             window.dispatchEvent(event);
@@ -102,13 +106,10 @@
         // Unity 인스턴스 생성 후 초기화 및 주기적 크기 확인
         createUnityInstance(canvas, config).then(function (instance) {
             canvas = instance.Module.canvas;
-            onResize(); // Unity 인스턴스 로드 후 크기 조정
             triggerResizeEvent();
-
         });
 
         window.addEventListener('resize', onResize);
-        onResize();
 
         // 모바일 뷰포트 설정
         if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
